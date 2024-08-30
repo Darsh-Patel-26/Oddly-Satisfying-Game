@@ -57,7 +57,11 @@
                 this.size = Math.random() * guiSettings.maxParticleSize + 1;
                 this.speedX = Math.random() * 3 - 1.5;
                 this.speedY = Math.random() * 3 - 1.5;
-                this.color = `hsl(${hue}, 100%, 50%)`;
+                if (guiSettings.useManualColor) {
+                    this.color = guiSettings.manualColor;
+                } else {
+                    this.color = `hsl(${hue}, 100%, 50%)`;
+                }
             }
 
             update() {
@@ -107,7 +111,9 @@
             ctx.fillStyle = `rgba(0, 0, 0, ${guiSettings.opacity})`;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             handleParticles();
-            hue += guiSettings.hueSpeed;
+            if (!guiSettings.useManualColor) {
+                hue += guiSettings.hueSpeed;
+            }
             requestAnimationFrame(animate);
         }
 
@@ -117,6 +123,8 @@
             hueSpeed: 2,
             opacity: 0.1,
             connectingNodes: false,
+            useManualColor: false,
+            manualColor: '#ff0000'
         };
 
         gui.add(guiSettings, 'particleCount', 1, 100).step(1).name('Particle Count');
@@ -124,6 +132,12 @@
         gui.add(guiSettings, 'hueSpeed', 0.1, 10).name('Hue Speed');
         gui.add(guiSettings, 'opacity', 0.01, 1).name('Opacity');
         gui.add(guiSettings, 'connectingNodes').name('Connect Nodes');
+        gui.add(guiSettings, 'useManualColor').name('Use Manual Color').onChange(value => {
+            if (value) {
+                guiSettings.manualColor = guiSettings.manualColor;
+            }
+        });
+        gui.addColor(guiSettings, 'manualColor').name('Manual Color');
 
         animate();
     </script>
